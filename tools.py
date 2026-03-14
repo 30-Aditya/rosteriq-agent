@@ -37,7 +37,7 @@ def query_duckdb_tool(sql_query: str) -> str:
     
     # UI Optimization: Keep only operational columns if too many
     if len(df.columns) > 5:
-        keep = ['ro_id', 'org_nm', 'latest_stage_nm', 'duration_days', 'cnt_state', 'scs_percent']
+        keep = ['ro_id', 'org_nm', 'latest_stage_nm', 'total_duration', 'cnt_state', 'scs_percent']
         actual_keep = [c for c in keep if c in df.columns]
         if actual_keep:
             df = df[actual_keep]
