@@ -7,24 +7,44 @@ from langchain_core.messages import HumanMessage
 from memory_layer import MemoryLayer
 from tools import (query_duckdb_tool, triage_stuck_ros, market_health_report,
                    generate_stuck_ro_viz, generate_success_trend_viz, 
-                   generate_retry_effectiveness_viz)
+                   generate_retry_effectiveness_viz, web_search_tool)
 
 load_dotenv()
 
-SYSTEM_CONTEXT = """You are RosterIQ, an AI for healthcare roster diagnostics.
-Workflow:
-1. Identify the need for data.
-2. Call query_duckdb_tool or a specialized procedure tool.
-3. Summarize the tool output concisely.
+SYSTEM_CONTEXT = """You are RosterIQ, an autonomous AI agent for healthcare roster pipeline operations.
 
-Local Procedures (Direct Commands):
-- triage_stuck_ros: Use for 'Run triage_stuck_ros'.
-- market_health_report: Use for 'dashboard' or 'market health'.
-- generate_retry_effectiveness_viz: Use for 'retry effectiveness'.
-- generate_stuck_ro_viz: Use for 'visualize stuck roster'.
-- generate_success_trend_viz: Use for 'success rate trend'.
+--- SEMANTIC MEMORY (DOMAIN KNOWLEDGE) ---
+PIPELINE STAGES:
+1. Ingestion: Initial file receipt.
+2. Pre-processing: Data cleanup and formatting.
+3. Mapping Approval: Validating field mappings.
+4. ISF Generation: Creating Intermediate Standard Format.
+5. DART Generation: Processing records through business rules.
+6. DART UI Validation: Manual or automated review of DART results.
+7. SPS Load: Final data loading into the core system.
 
-Rule: Do NOT dump raw query results. Provide a short operational insight and recommended action.
+HEALTH FLAGS:
+- Green: Stage completed within historical average duration.
+- Yellow: Duration exceeds historical average (Potential Bottleneck).
+- Red: Stage has failed or critical error detected.
+
+OPERATIONAL STATES:
+- IS_STUCK: Boolean. The RO is stalled in a stage (active but not moving).
+- IS_FAILED: Boolean. The RO has encountered a terminal error.
+
+BUSINESS CONTEXT:
+- LOBs: Medicare HMO, Medicaid FFS, Commercial PPO/EPO, etc.
+- Source Systems: AvailityPDM, Demographic, ProviderGroup.
+
+--- WORKFLOW & TOOLS ---
+1. Use web_search_tool logic for external context (CMS rules, regulatory shifts, provider org info).
+2. Use local procedure tools for direct commands:
+   - "Run triage_stuck_ros" -> Identify logic for stuck ROs.
+   - "Analyze retry effectiveness" -> Use generate_retry_effectiveness_viz.
+   - "Show market health dashboard" -> Use market_health_report.
+3. Use query_duckdb_tool for general SQL joins & data mining.
+
+STRICT RULE: Local SQL -> Local Chart -> LLM Explanation. DO NOT dump raw CSV rows.
 """
 
 class RosterAgent:
@@ -48,7 +68,8 @@ class RosterAgent:
             "market_health_report": market_health_report,
             "generate_stuck_ro_viz": generate_stuck_ro_viz,
             "generate_success_trend_viz": generate_success_trend_viz,
-            "generate_retry_effectiveness_viz": generate_retry_effectiveness_viz
+            "generate_retry_effectiveness_viz": generate_retry_effectiveness_viz,
+            "web_search_tool": web_search_tool
         }
 
     def _call_tool(self, tool_name: str, tool_args: dict) -> str:

@@ -3,6 +3,8 @@ import os
 import plotly.express as px
 from langchain.tools import tool
 
+from langchain_community.tools import DuckDuckGoSearchRun
+
 # Using global instance with absolute paths for robustness
 from data_engine import DataEngine
 base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -10,6 +12,12 @@ engine = DataEngine(
     os.path.join(base_dir, "roster_processing_details.csv"), 
     os.path.join(base_dir, "aggregated_operational_metrics.csv")
 )
+
+@tool
+def web_search_tool(query: str) -> str:
+    """Useful for fetching external regulatory context, CMS rules, or provider org business info."""
+    search = DuckDuckGoSearchRun()
+    return search.run(query)
 
 def _safe_df_check(df):
     """Internal helper to safely check if engine result is a valid non-empty DataFrame."""
