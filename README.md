@@ -1,5 +1,7 @@
 # RosterIQ: Memory-Driven Provider Roster Intelligence 🧠
 
+**Project Deliverables (Docs & Demo):** [View on Google Drive](https://drive.google.com/drive/folders/1AI8nTYpGFuocRDHTyvSWbwltjT3Dn7Mq?usp=sharing)
+
 RosterIQ is an autonomous AI agent designed for HiLabs AgentX AI 2026. It operates over healthcare roster pipeline and market transaction data, maintaining a multi-layered memory system to diagnose operational anomalies with high precision.
 
 ## 🚀 Key Features
