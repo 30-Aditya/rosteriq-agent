@@ -133,7 +133,7 @@ class RosterAgent:
                     return raw
         except Exception as e:
             # --- LLM Fallback: If API fails, try to fulfill via SQL tool directly ---
-            fallback_res = self._call_tool("query_duckdb_tool", {"sql_query": "SELECT * FROM roster_diagnosis_view WHERE operational_status = 'Stuck' LIMIT 5"})
-            return f"Note: LLM currently unavailable. Direct Data Result:\n\n{fallback_res}"
+            fallback_res = self._call_tool("query_duckdb_tool", {"sql_query": "SELECT ro_id, org_nm, latest_stage_nm, duration_days FROM roster_diagnosis_view LIMIT 5"})
+            return f"Note: LLM currently unavailable. Direct Data Result (Diagnostic View):\n\n{fallback_res}"
 
         return "Agent encountered an error. Please try a direct command."

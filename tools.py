@@ -1,4 +1,4 @@
-# VERSION: 1.2 (Emergency Safe Patch)
+VERSION = "1.2 (STABLE)"
 import os
 import plotly.express as px
 from langchain.tools import tool
@@ -31,9 +31,17 @@ def _safe_df_check(df):
 
 @tool
 def query_duckdb_tool(sql_query: str) -> str:
-    """Executes a SQL query against RosterIQ datasets."""
+    """Executes a SQL query against RosterIQ datasets. Results are optimized for UI display."""
     df = engine.query(sql_query)
     if isinstance(df, str): return df
+    
+    # UI Optimization: Keep only operational columns if too many
+    if len(df.columns) > 5:
+        keep = ['ro_id', 'org_nm', 'latest_stage_nm', 'duration_days', 'cnt_state', 'scs_percent']
+        actual_keep = [c for c in keep if c in df.columns]
+        if actual_keep:
+            df = df[actual_keep]
+
     return df.to_markdown(index=False)
 
 @tool
